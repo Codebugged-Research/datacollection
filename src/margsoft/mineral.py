@@ -3,10 +3,11 @@ import time
 import numpy as np
 import os
 import pathlib
+from datetime import datetime
 import sys
 CONFIDENCE_THRESHOLD = 0.25
 NMS_THRESHOLD = 0.1
-def collectdataset(rtsp,names_file,weight_file,cfg_file,num_images,path,dir_n):
+def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n):
     print("inside the function")
     cap = cv2.VideoCapture(rtsp, cv2.CAP_FFMPEG)
     prevTime = 0
@@ -21,13 +22,10 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,num_images,path,dir_n):
     # frame_width = int(cap.get(3))
     # frame_height = int(cap.get(4))
     # size = (frame_width, frame_height)
-
     colors = np.random.uniform(0,255,size=(len(class_names),3))
     net = cv2.dnn.readNet(weight_file,cfg_file)
     model = cv2.dnn_DetectionModel(net)
     model.setInputParams(size=(640, 640), scale=1/255, swapRB=True)
-
-    name = 0
     pathlib.Path(path+str(dir_n)).mkdir(parents=True, exist_ok=True)
     print("Is rtsp stream opend :",cap.isOpened())
     try:
@@ -38,14 +36,11 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,num_images,path,dir_n):
             classes, scores, boxes = model.detect(frame, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
             for (classid, score, box) in zip(classes, scores, boxes):
                 if(class_names[classid]=="car" or class_names[classid]=="truck" or class_names[classid]=="bus"):
-                    if name<num_images:
                         print("found!!!")
-                        f_name = path+dir_n+"/"+str(name)+".jpg"
+                        curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+                        f_name = path+dir_n+"/"+str(curr_datetime)+".jpg"
                         cv2.imwrite(f_name, frame)
                         print(f_name)
-                        name += 1
-                    else:
-                        sys.exit()
     except KeyboardInterrupt:
         print("Bye")
         sys.exit()
