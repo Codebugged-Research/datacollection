@@ -7,22 +7,22 @@ from datetime import datetime
 import sys
 CONFIDENCE_THRESHOLD = 0.25
 NMS_THRESHOLD = 0.1
-def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n):
+def collectdataset(rtsp,weight_file,cfg_file,path,dir_n):
     print("inside the function")
     cap = cv2.VideoCapture(rtsp, cv2.CAP_FFMPEG)
     prevTime = 0
     # width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     # height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     #cv2.namedWindow("output", cv2.WINDOW_NORMAL)    
-    class_names = []
-    with open(names_file, "r") as f:
-        class_names = [cname.strip() for cname in f.readlines()]
+    #class_names = []
+    #with open(names_file, "r") as f:
+    #class_names = [cname.strip() for cname in f.readlines()]
 
         
     # frame_width = int(cap.get(3))
     # frame_height = int(cap.get(4))
     # size = (frame_width, frame_height)
-    colors = np.random.uniform(0,255,size=(len(class_names),3))
+    #colors = np.random.uniform(0,255,size=(len(class_names),3))
     net = cv2.dnn.readNet(weight_file,cfg_file)
     model = cv2.dnn_DetectionModel(net)
     model.setInputParams(size=(640, 640), scale=1/255, swapRB=True)
@@ -35,12 +35,12 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n):
             frame = np.array(frame)
             classes, scores, boxes = model.detect(frame, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
             for (classid, score, box) in zip(classes, scores, boxes):
-                if(class_names[classid]=="car" or class_names[classid]=="truck" or class_names[classid]=="bus"):
-                        print("found!!!")
-                        curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
-                        f_name = path+dir_n+"/"+str(curr_datetime)+".jpg"
-                        cv2.imwrite(f_name, frame)
-                        print(f_name)
+                #if(class_names[classid]=="car" or class_names[classid]=="truck" or class_names[classid]=="bus"):
+                print("found!!!")
+                curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+                f_name = path+dir_n+"/"+str(curr_datetime)+".jpg"
+                cv2.imwrite(f_name, frame)
+                print(f_name)
     except KeyboardInterrupt:
         print("Bye")
         sys.exit()
