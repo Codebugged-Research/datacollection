@@ -14,8 +14,8 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n):
     # width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     # height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     cv2.namedWindow("output", cv2.WINDOW_NORMAL)    
-        class_names = []
-        with open(names_file, "r") as f:
+    class_names = []
+    with open(names_file, "r") as f:
         class_names = [cname.strip() for cname in f.readlines()]
 
         
@@ -35,7 +35,7 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n):
             frame = np.array(frame)
             classes, scores, boxes = model.detect(frame, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
             for (classid, score, box) in zip(classes, scores, boxes):
-                if(class_names[classid]!="other":
+                if(class_names[classid]!="other"):
                     print("found!!!")
                     curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
                     f_name = path+dir_n+"/"+str(curr_datetime)+".jpg"
