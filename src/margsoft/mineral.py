@@ -22,7 +22,6 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,num_images,path,dir_n):
     # frame_height = int(cap.get(4))
     # size = (frame_width, frame_height)
 
-
     colors = np.random.uniform(0,255,size=(len(class_names),3))
     net = cv2.dnn.readNet(weight_file,cfg_file)
     model = cv2.dnn_DetectionModel(net)
@@ -34,6 +33,7 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,num_images,path,dir_n):
     try:
         while cap.isOpened(): 
             ret, frame = cap.read()
+            frame=cv2.resize(frame, (720, 720))
             frame = np.array(frame)
             classes, scores, boxes = model.detect(frame, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
             for (classid, score, box) in zip(classes, scores, boxes):
