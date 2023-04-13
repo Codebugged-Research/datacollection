@@ -7,7 +7,7 @@ from datetime import datetime
 import sys
 CONFIDENCE_THRESHOLD = 0.7
 NMS_THRESHOLD = 0.1
-def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n):
+def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z_1):
     print("inside the function")
     cap = cv2.VideoCapture(rtsp, cv2.CAP_FFMPEG)
     prevTime = 0
@@ -31,9 +31,11 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n):
     try:
         while cap.isOpened(): 
             ret, frame = cap.read()
+            frame_crop=frame[y_1:z_1,x_1:w_1]
+            frame_crop= np.array(frame_crop)
             frame=cv2.resize(frame, (720, 720))
             frame = np.array(frame)
-            classes, scores, boxes = model.detect(frame, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
+            classes, scores, boxes = model.detect(frame_crop, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
             for (classid, score, box) in zip(classes, scores, boxes):
                 if(class_names[classid] not in ["other"]):
                     print(class_names[classid],score)
