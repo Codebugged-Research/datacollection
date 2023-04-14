@@ -13,7 +13,7 @@ SRC_REPO = "src"
 
 setuptools.setup(
     name="margsoft",
-    version="0.0.10",
+    version="0.0.11",
     author=AUTHOR_USER_NAME,
     description="data collection package",
     long_description=long_description,
