@@ -1,6 +1,8 @@
 import cv2
 import time
 import numpy as np
+import psutil
+import sys
 import os
 import pathlib
 from datetime import datetime
@@ -30,6 +32,12 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z
     print("Is rtsp stream opend :",cap.isOpened())
     try:
         while cap.isOpened(): 
+            cpu_percent = psutil.cpu_percent(interval=1)
+            if cpu_percent > 200.0:
+                print(f"CPU utilization: {cpu_percent}%")
+                print("CPU utilization exceeded 200%. Exiting...")
+                sys.exit()
+            print(f"CPU utilization: {cpu_percent}%")
             ret, frame = cap.read()
             if poly:
                 frame_crop=frame
@@ -44,7 +52,6 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z
             frame = np.array(frame)
             classes, scores, boxes = model.detect(frame_crop, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
             for (classid, score, box) in zip(classes, scores, boxes):
-                if(class_names[classid] not in ["other"]):
                     print(class_names[classid],score)
                     print("found!!!")
                     curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
