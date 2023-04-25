@@ -48,7 +48,7 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z
             else:
                 frame_crop=frame
             frame_crop= np.array(frame_crop)
-            frame=cv2.resize(frame, (720, 720))
+            frame=cv2.resize(frame, (900, 900))
             frame = np.array(frame)
             classes, scores, boxes = model.detect(frame_crop, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
             for (classid, score, box) in zip(classes, scores, boxes):
