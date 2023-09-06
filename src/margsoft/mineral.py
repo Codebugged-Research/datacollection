@@ -9,7 +9,7 @@ from datetime import datetime
 import sys
 CONFIDENCE_THRESHOLD = 0.7
 NMS_THRESHOLD = 0.1
-def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z_1,poly,roi,pts_left,pts_right):
+def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z_1,poly,roi,pts_left,pts_right,exit_percent=200.0):
     print("inside the function")
     cap = cv2.VideoCapture(rtsp, cv2.CAP_FFMPEG)
     prevTime = 0
@@ -33,7 +33,7 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z
     try:
         while cap.isOpened(): 
             cpu_percent = psutil.cpu_percent(interval=1)
-            if cpu_percent > 200.0:
+            if cpu_percent > exit_percent:
                 print(f"CPU utilization: {cpu_percent}%")
                 print("CPU utilization exceeded 200%. Exiting...")
                 sys.exit()
