@@ -35,7 +35,7 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z
             cpu_percent = psutil.cpu_percent(interval=1)
             if cpu_percent > exit_percent:
                 print(f"CPU utilization: {cpu_percent}%")
-                print("CPU utilization exceeded 200%. Exiting...")
+                print(f"CPU utilization exceeded {exit_percent}%. Exiting...")
                 sys.exit()
             print(f"CPU utilization: {cpu_percent}%")
             ret, frame = cap.read()
