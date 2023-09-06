@@ -36,7 +36,7 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z
             while cpu_percent > exit_percent:
                 print(f"CPU utilization: {cpu_percent}%")
                 print(f"CPU utilization exceeded {exit_percent}%. Pausing until CPU utilization decreases...")
-                print("sleeping for 5 seconds)
+                print("sleeping for 5 seconds")
                 time.sleep(5)  # Sleep for 1 second before checking again
                 cpu_percent = psutil.cpu_percent(interval=1)
                 
