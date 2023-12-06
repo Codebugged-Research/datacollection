@@ -44,7 +44,7 @@ def collectdataset(rtsp,names_file,weight_file,cfg_file,path,dir_n,x_1,y_1,w_1,z
             print(f"CPU utilization: {cpu_percent}%")
             ret, frame = cap.read()
             if ret:
-                frame=cv2.resize(frame, (900, 900))
+                #frame=cv2.resize(frame, (900, 900))
                 if poly:
                     frame_crop=frame.copy()
                     cv2.fillPoly(frame_crop, [pts_left], 0)
