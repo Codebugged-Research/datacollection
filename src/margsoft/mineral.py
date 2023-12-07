@@ -18,8 +18,9 @@ def collectdataset(rtsp, names_file, weight_file, cfg_file, path, dir_n, x_1, y_
             print("Failed to open the stream.")
             return None
         return cap
-    
-    cap = get_video_capture(rtsp)
+        
+    cap = cv2.VideoCapture(rtsp, cv2.CAP_FFMPEG)
+    # cap = get_video_capture(rtsp)
     class_names = []
     with open(names_file, "r") as f:
         class_names = [cname.strip() for cname in f.readlines()]
@@ -65,6 +66,7 @@ def collectdataset(rtsp, names_file, weight_file, cfg_file, path, dir_n, x_1, y_
                     cap = get_video_capture(rtsp)
             else:
                 # Attempt to reconnect if the capture is None
+                print("Error in frame")
                 time.sleep(3)
                 cap = get_video_capture(rtsp)
     
