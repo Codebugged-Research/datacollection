@@ -1,5 +1,3 @@
-
-
 import cv2
 import time
 import numpy as np
@@ -30,54 +28,53 @@ def collectdataset(rtsp, names_file, weight_file, cfg_file, path, dir_n, x_1, y_
     model = cv2.dnn_DetectionModel(net)
     model.setInputParams(size=(640, 640), scale=1/255, swapRB=True)
     pathlib.Path(path + str(dir_n)).mkdir(parents=True, exist_ok=True)
-    
-    while True: 
-        if cap is not None:
-            cpu_percent = psutil.cpu_percent(interval=1)
-            while cpu_percent > exit_percent:
-                print(f"CPU utilization: {cpu_percent}%")
-                print(f"CPU utilization exceeded {exit_percent}%. Pausing until CPU utilization decreases...")
-                time.sleep(5)  # Sleep for 5 seconds before checking again
+    try:
+        while True: 
+            if cap is not None:
                 cpu_percent = psutil.cpu_percent(interval=1)
-            
-            ret, frame = cap.read()
-            if ret:
-                if poly:
-                    frame_crop = frame.copy()
-                    cv2.fillPoly(frame_crop, [pts_left], 0)
-                    cv2.fillPoly(frame_crop, [pts_right], 0)
-                elif roi:
-                    frame_crop = frame[y_1:z_1, x_1:w_1]
+                while cpu_percent > exit_percent:
+                    print(f"CPU utilization: {cpu_percent}%")
+                    print(f"CPU utilization exceeded {exit_percent}%. Pausing until CPU utilization decreases...")
+                    time.sleep(5)  # Sleep for 5 seconds before checking again
+                    cpu_percent = psutil.cpu_percent(interval=1)
+                
+                ret, frame = cap.read()
+                if ret:
+                    if poly:
+                        frame_crop = frame.copy()
+                        cv2.fillPoly(frame_crop, [pts_left], 0)
+                        cv2.fillPoly(frame_crop, [pts_right], 0)
+                    elif roi:
+                        frame_crop = frame[y_1:z_1, x_1:w_1]
+                    else:
+                        frame_crop = frame
+                    frame_crop = np.array(frame_crop)
+                    frame = np.array(frame)
+                    classes, scores, boxes = model.detect(frame_crop, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
+                    for (classid, score, box) in zip(classes, scores, boxes):
+                        print(class_names[classid], score)
+                        print("found!!!")
+                        curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+                        f_name = path + dir_n + "/" + str(curr_datetime) + ".jpg"
+                        cv2.imwrite(f_name, frame)
+                        print(f_name)
                 else:
-                    frame_crop = frame
-                frame_crop = np.array(frame_crop)
-                frame = np.array(frame)
-                classes, scores, boxes = model.detect(frame_crop, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
-                for (classid, score, box) in zip(classes, scores, boxes):
-                    print(class_names[classid], score)
-                    print("found!!!")
-                    curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
-                    f_name = path + dir_n + "/" + str(curr_datetime) + ".jpg"
-                    cv2.imwrite(f_name, frame)
-                    print(f_name)
+                    print("No Frame, attempting to reconnect...")
+                    cap.release()
+                    time.sleep(5)  # Wait for 5 seconds before trying to reconnect
+                    cap = get_video_capture(rtsp)
             else:
-                print("No Frame, attempting to reconnect...")
-                cap.release()
-                time.sleep(5)  # Wait for 5 seconds before trying to reconnect
+                # Attempt to reconnect if the capture is None
+                time.sleep(3)
                 cap = get_video_capture(rtsp)
-        else:
-            # Attempt to reconnect if the capture is None
-            time.sleep(3)
-            cap = get_video_capture(rtsp)
+    
+        if cap is not None:
+            cap.release()
 
-    if cap is not None:
-        cap.release()
 
-try:
-    collectdataset("your_rtsp_url", "names_file.txt", "weight_file.weights", "cfg_file.cfg", "/path/to/save/", "dir_name", 0, 0, 640, 480, False, True, [], [], 200.0)
-except KeyboardInterrupt:
-    print("Bye")
-    sys.exit()
+    except KeyboardInterrupt:
+        print("Bye")
+        sys.exit()
 
 # import cv2
 # import time
