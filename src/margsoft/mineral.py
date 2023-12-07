@@ -6,11 +6,11 @@ import sys
 import os
 import pathlib
 from datetime import datetime
-CONFIDENCE_THRESHOLD = 0.7
-NMS_THRESHOLD = 0.1
 
-def collectdataset(rtsp, names_file, weight_file, cfg_file, path, dir_n, x_1, y_1, w_1, z_1, poly, roi, pts_left, pts_right, exit_percent=200.0):
+def collectdataset(rtsp, names_file, weight_file, cfg_file, path, dir_n, x_1, y_1, w_1, z_1, poly, roi, pts_left, pts_right,cnf=0.6,exit_percent=200.0):
     print("inside the function")
+    CONFIDENCE_THRESHOLD = cnf
+    NMS_THRESHOLD = 0.1
     
     def get_video_capture(rtsp_url):
         cap = cv2.VideoCapture(rtsp_url, cv2.CAP_FFMPEG)
