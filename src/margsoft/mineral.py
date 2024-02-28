@@ -10,7 +10,7 @@ from datetime import datetime
 
 def collectdataset(rtsp, weight_file,path, dir_n, x_1, y_1, w_1, z_1, poly, roi, pts_left, pts_right,cnf=0.6,exit_percent=200.0):
     print("inside the function")
-    model = YOLO('weight_file')
+    model = YOLO(weight_file)
     CONFIDENCE_THRESHOLD = cnf
     NMS_THRESHOLD = 0.2
     
