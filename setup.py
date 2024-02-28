@@ -13,7 +13,7 @@ SRC_REPO = "src"
 
 setuptools.setup(
     name="margsoft",
-    version="0.0.26",
+    version="0.0.27",
     author=AUTHOR_USER_NAME,
     description="data collection package",
     long_description=long_description,
@@ -25,7 +25,7 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     license="MIT",
     install_requires=['opencv-python',
-                   'numpy',],
+                   'numpy','ultralytics'],
         classifiers=[
         'Intended Audience :: Developers', 'Operating System :: OS Independent',
         'Natural Language :: Chinese (Simplified)',
