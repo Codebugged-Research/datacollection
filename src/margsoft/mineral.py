@@ -1,16 +1,18 @@
 import cv2
 import time
 import numpy as np
+from ultralytics import YOLO
 import psutil
 import sys
 import os
 import pathlib
 from datetime import datetime
 
-def collectdataset(rtsp, names_file, weight_file, cfg_file, path, dir_n, x_1, y_1, w_1, z_1, poly, roi, pts_left, pts_right,cnf=0.6,exit_percent=200.0):
+def collectdataset(rtsp, weight_file,path, dir_n, x_1, y_1, w_1, z_1, poly, roi, pts_left, pts_right,cnf=0.6,exit_percent=200.0):
     print("inside the function")
+    model = YOLO('weight_file')
     CONFIDENCE_THRESHOLD = cnf
-    NMS_THRESHOLD = 0.1
+    NMS_THRESHOLD = 0.2
     
     def get_video_capture(rtsp_url):
         cap = cv2.VideoCapture(rtsp_url, cv2.CAP_FFMPEG)
@@ -21,13 +23,13 @@ def collectdataset(rtsp, names_file, weight_file, cfg_file, path, dir_n, x_1, y_
         
     cap = cv2.VideoCapture(rtsp, cv2.CAP_FFMPEG)
     # cap = get_video_capture(rtsp)
-    class_names = []
-    with open(names_file, "r") as f:
-        class_names = [cname.strip() for cname in f.readlines()]
+    # class_names = []
+    # with open(names_file, "r") as f:
+    #     class_names = [cname.strip() for cname in f.readlines()]
 
-    net = cv2.dnn.readNet(weight_file, cfg_file)
-    model = cv2.dnn_DetectionModel(net)
-    model.setInputParams(size=(640, 640), scale=1/255, swapRB=True)
+    # net = cv2.dnn.readNet(weight_file, cfg_file)
+    # model = cv2.dnn_DetectionModel(net)
+    # model.setInputParams(size=(640, 640), scale=1/255, swapRB=True)
     pathlib.Path(path + str(dir_n)).mkdir(parents=True, exist_ok=True)
     try:
         while True: 
@@ -53,16 +55,18 @@ def collectdataset(rtsp, names_file, weight_file, cfg_file, path, dir_n, x_1, y_
                     frame_crop = np.array(frame_crop)
                     frame = np.array(frame)
                     start=time.time()
-                    classes, scores, boxes = model.detect(frame_crop, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
+                    results = model(frame_crop,conf=CONFIDENCE_THRESHOLD,iou=NMS_THRESHOLD)
+                    # classes, scores, boxes = model.detect(frame_crop, CONFIDENCE_THRESHOLD, NMS_THRESHOLD)
                     end=time.time()
                     print("Time taken for inference : ",end-start)
-                    for (classid, score, box) in zip(classes, scores, boxes):
-                        print(class_names[classid], score)
-                        print("found!!!")
-                        curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
-                        f_name = path + dir_n + "/" + str(curr_datetime) + ".jpg"
-                        cv2.imwrite(f_name, frame)
-                        print(f_name)
+                    if len(results[0].boxes.xyxy)>0:
+                        for bbox,score,class_id, in zip(results[0].boxes.xyxy,results[0].boxes.conf,results[0].boxes.cls):
+                            print(model.names[int(class_id)], score)
+                            print("found!!!")
+                            curr_datetime = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+                            f_name = path + dir_n + "/" + str(curr_datetime) + ".jpg"
+                            cv2.imwrite(f_name, frame)
+                            print(f_name)
                 else:
                     print("No Frame, attempting to reconnect...")
                     cap.release()
